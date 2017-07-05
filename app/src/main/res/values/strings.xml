@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">TwitterClient</string>
+
+    <!--Login strings-->
+    <string name="login_with_twitter">Login with twitter</string>
+    <string name="login_failed_msg">Something went wrong. please try again later</string>
+
+    <string name="error_msg">Error occured. Please try again later.</string>
+    <string name="no_internet">No internet. Please check your connection.</string>
+    <string name="no_tweets">Sorry there are no tweets!</string>
+
+    <string name="changeLanguage">عربي</string>
+
+</resources>
