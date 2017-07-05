@@ -2,7 +2,6 @@ package adel.twitterclient.ui.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,9 +16,7 @@ import java.util.ArrayList;
 
 import adel.twitterclient.R;
 import adel.twitterclient.businessModel.DTO.FollowerInfo;
-import adel.twitterclient.ui.RecyclerViewClickListener;
 import adel.twitterclient.ui.viewController.FollowerInformationActivity;
-import adel.twitterclient.util.ActivitySwiping;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -36,8 +33,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private LayoutInflater mInflater = null;
     ViewHolder viewHolder;
     Context mContext;
-    private RecyclerViewClickListener onItemClickListener;
-
+    FollowerInfo follower;
     public RecyclerViewAdapter(Context mContext, ArrayList<FollowerInfo> followersInfo) {
 
         this.followersInfo = followersInfo;
@@ -56,7 +52,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        FollowerInfo follower = followersInfo.get(position);
+         follower = followersInfo.get(position);
         if (follower.getProfileImageUrl() !=null){
             Glide.with(mContext)
                     .load(follower.getProfileImageUrl())
@@ -79,12 +75,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             ((ViewHolder)holder).followerBioTextView.setText(follower.getBio());
         }
 
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onItemClickListener.onItemClick((FollowerInfo.NewsEntity)newsEntity);
-            }
-        };
     }
 
     @Override
@@ -116,13 +106,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    Intent intent = new Intent(mContext, UserProfileActivity.class);
-//                    intent.putExtra(FOLLOWER_EXTRA, mFollowers.get(getLayoutPosition()));
-//                    mContext.startActivity(intent);
 
-                    Bundle b=new Bundle();
-                    b.putString("follower", followersInfo.get(getLayoutPosition()));
-                    ActivitySwiping.goTOAnotherActivityWithBundle(mContext,FollowerInformationActivity.class,b);
+                    Intent intent = new Intent(mContext, FollowerInformationActivity.class);
+                    intent.putExtra("follower", followersInfo.get(getLayoutPosition()));
+                    mContext.startActivity(intent);
                 }
             });
 
