@@ -13,8 +13,11 @@ import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 import adel.twitterclient.R;
 import adel.twitterclient.twitter.TwitterClientHelper;
 import adel.twitterclient.util.ActivitySwiping;
+import adel.twitterclient.util.SharedPreference;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static adel.twitterclient.application.TwitterClientApplication.LOCAL_LANG;
 
 public class LoginActivity extends ParentActivity {
 
@@ -31,7 +34,13 @@ public class LoginActivity extends ParentActivity {
 
         twitterLoginButton.setText(R.string.login_with_twitter);
         twitterLoginButton.setCallback(twitterLoginCallback);
+        String localeLang = (String) SharedPreference.load_SP_Data(this, LOCAL_LANG,String.class);
+        if(localeLang==null)
+        {
+            localeLang = "en";
+            SharedPreference.save_SP_Data(this,LOCAL_LANG,localeLang);
 
+        }
     }
 
     private void checkUserSession() {

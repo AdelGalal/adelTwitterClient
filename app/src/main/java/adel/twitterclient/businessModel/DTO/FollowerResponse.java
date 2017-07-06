@@ -20,6 +20,10 @@ public class FollowerResponse implements Parcelable {
     private String previous_cursor;
     private String next_cursor_str;
 
+    public FollowerResponse() {
+        this.users = new ArrayList<>();
+    }
+
     protected FollowerResponse(Parcel in) {
         users = in.createTypedArrayList(FollowerInfo.CREATOR);
         next_cursor = in.readString();

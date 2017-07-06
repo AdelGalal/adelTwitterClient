@@ -24,6 +24,7 @@
         android:background="@color/colorPrimary"
         android:textColor="@color/tw__composer_white"
         android:text="@string/changeLanguage"
+        android:textAllCaps="false"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"/>
 </RelativeLayout>

@@ -13,10 +13,16 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
 import com.google.gson.JsonElement;
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.QueryBuilder;
 
 import java.util.ArrayList;
+import java.util.Locale;
+import java.util.concurrent.Callable;
 
 import adel.twitterclient.R;
+import adel.twitterclient.application.TwitterClientApplication;
+import adel.twitterclient.database.DatabaseConfig;
 import adel.twitterclient.twitter.TwitterClientHelper;
 import adel.twitterclient.businessModel.DTO.FollowerInfo;
 import adel.twitterclient.businessModel.DTO.FollowerResponse;
@@ -25,9 +31,13 @@ import adel.twitterclient.businessModel.gson.Gson;
 import adel.twitterclient.ui.adapter.RecyclerViewAdapter;
 import adel.twitterclient.ui.dataController.FollowerDataController;
 import adel.twitterclient.ui.dataController.FollowersListener;
+import adel.twitterclient.util.SharedPreference;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit2.Response;
+
+import static adel.twitterclient.application.TwitterClientApplication.LOCAL_LANG;
 
 public class FollowersActivity extends Activity implements FollowersListener {
     @BindView(R.id.recycler_view)
@@ -44,6 +54,7 @@ public class FollowersActivity extends Activity implements FollowersListener {
      @BindView(R.id.loader)
      ProgressBar progressBar;
 
+    private DatabaseConfig databaseConfig;
     LinearLayoutManager linearLayoutManager;
     ArrayList<FollowerInfo> mFollowers;
     RecyclerViewAdapter mAdapter;
@@ -56,23 +67,32 @@ public class FollowersActivity extends Activity implements FollowersListener {
     public boolean isLoading = false;
     private static boolean isTheEnd = false;
     FollowerResponse followerResponse;
-    private FollowerDataController followerDataController;
+   // private FollowerDataController followerDataController;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        databaseConfig = new DatabaseConfig(this);
+
         ButterKnife.bind(this);
         prepareViewsAndData();
         startConnectionToGetFollowers();
     }
     private void prepareViewsAndData()
     {
+        databaseConfig = new DatabaseConfig(FollowersActivity.this);
         linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
         followerSwipeRefreshLayout.setOnRefreshListener(swipRefreshListener);
-//        followerDataController=new FollowerDataController(this,cursor);
+        changeLanguageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                TwitterClientApplication.forceChangeLanguage(FollowersActivity.this);
+            }
+        });
+ //       followerDataController=new FollowerDataController(this,cursor);
 //        followerDataController.setFollowersListener(this);
     }
     private SwipeRefreshLayout.OnRefreshListener swipRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
@@ -90,6 +110,7 @@ public class FollowersActivity extends Activity implements FollowersListener {
             }
         }
     };
+
     private void startConnectionToGetFollowers()
     {
         showProgressbar();
@@ -103,6 +124,7 @@ public class FollowersActivity extends Activity implements FollowersListener {
                     if (response.isSuccessful())
                     {
                         followerResponse = Gson.parseFollowers(response.body());
+                        accessAndUpdateDatabase(followerResponse);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -126,7 +148,7 @@ public class FollowersActivity extends Activity implements FollowersListener {
                                         }
 
                                         int lastInScreen = mFirstVisibleItem + mVisibleItemCount;
-                                        
+
                                         if ((lastInScreen == mTotalItemCount) && !(isLoading) && (mTotalItemCount >= 30) && !isTheEnd) {
                                             cursor = followerResponse.getNext_cursor();
                                             loadMoreFollowers();
@@ -153,67 +175,15 @@ public class FollowersActivity extends Activity implements FollowersListener {
             }).start();
         }
         else {
-            //loadOffline();
+            loadOffline();
             showErrorToast();
             hideProgressbar();
 
         }
     }
 
-//    private void setRecyclerViewOfFollowers(FollowerResponse followerResponse)
-//    {
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                isLoading = false;
-//                mFollowers = followerResponse.getFollowerOfUsers();
-//                mAdapter = new RecyclerViewAdapter(FollowersActivity.this, mFollowers);
-//                recyclerView.setAdapter(mAdapter);
-//                recyclerView.setHasFixedSize(true);
-//                hideProgressbar();
-//
-//                recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-//                    @Override
-//                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//                        super.onScrolled(recyclerView, dx, dy);
-//                        mVisibleItemCount = recyclerView.getChildCount();
-//                        mTotalItemCount = linearLayoutManager.getItemCount();
-//                        mFirstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
-//
-//                        //checking if no more results to get
-//                        if (isTheEnd) {
-//                            return;
-//                        }
-//
-//                        int lastInScreen = mFirstVisibleItem + mVisibleItemCount;
-//
-//                        //check if got to last item and not loading and the item count is bigger than default:20
-//                        if ((lastInScreen == mTotalItemCount) && !(isLoading) && (mTotalItemCount >= 30) && !isTheEnd) {
-//                            cursor = followerResponse.getNext_cursor();
-//                            loadMoreFollowers();
-//
-//                        }
-//
-//                    }
-//                });
-//
-//            }
-//        });
-//    } else {
-//
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                Toast.makeText(FollowersActivity.this, getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
-//                hideProgressbar();
-//
-//            }
-//        });
-//    }
- //   }
     private void loadMoreFollowers() {
 
-        Log.e("loadMoreFollowers","loadMoreFollowers");
         if (NetwrokConfig.isConnectedToInternet(this)) {
             isLoading = true;
            showProgressbar();
@@ -224,7 +194,7 @@ public class FollowersActivity extends Activity implements FollowersListener {
                     final retrofit2.Response<JsonElement> res = TwitterClientHelper.GetFollowers(TwitterClientHelper.GetCurrentUserId(), NUM_OF_ITEMS, cursor);
                     if (res !=null && res.isSuccessful()) {
                         followerResponse = Gson.parseFollowers(res.body());
-                        //updateDatabase(response);
+                        accessAndUpdateDatabase(followerResponse);
 
                         runOnUiThread(new Runnable() {
                             @Override
@@ -252,11 +222,8 @@ public class FollowersActivity extends Activity implements FollowersListener {
                 }
             }).start();
         } else {
-
             showErrorToast();
             isLoading = false;
-
-
         }
 
     }
@@ -274,6 +241,132 @@ public class FollowersActivity extends Activity implements FollowersListener {
         Toast.makeText(FollowersActivity.this, getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
         hideProgressbar();
     }
+
+    private void accessAndUpdateDatabase(final FollowerResponse followerResponse) {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Log.e("accessAndUpdateDatabase--","accessAndUpdateDatabase--");
+                    final Dao<FollowerInfo, Integer> followersDao = databaseConfig.getFollowerInfoDao();
+                    followersDao.callBatchTasks(new Callable<Void>() {
+                        @Override
+                        public Void call() throws Exception {
+                            if (followerResponse != null && followerResponse.getFollowerOfUsers() != null) {
+                                for (FollowerInfo f : followerResponse.getFollowerOfUsers())
+                                    followersDao.createOrUpdate(f);
+                                Log.e("followerResponse--","followerResponse--");
+                            }
+                            return null;
+                        }
+                    });
+
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }).start();
+
+    }
+    private void loadOffline() {
+        Log.e("loadOffline","loadOffline");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final Dao<FollowerInfo, Integer> followersDao = databaseConfig.getFollowerInfoDao();
+                    Log.e("loadOffline","loadOffline"+databaseConfig.getFollowerInfoDao());
+                    int totalNumber = (int) followersDao.countOf();
+                    QueryBuilder<FollowerInfo, Integer> builder = followersDao.queryBuilder();
+
+                    if (followerResponse == null){
+                        followerResponse = new FollowerResponse();
+                        builder.offset((long) followerResponse.getFollowerOfUsers().size()).limit((long) NUM_OF_ITEMS);
+
+                    }else {
+                        builder.offset((long) followerResponse.getFollowerOfUsers().size()).limit((long) NUM_OF_ITEMS);
+                    }
+
+                    followerResponse.setUsers((ArrayList<FollowerInfo>) followersDao.query(builder.prepare()));
+
+                    if ((followerResponse.getFollowerOfUsers().size() + NUM_OF_ITEMS) >= totalNumber)
+                    {
+                        followerResponse.setNext_cursor("0");
+                    }
+
+                    else
+                    {
+                        followerResponse.setNext_cursor("-1");
+                    }
+
+                    if (mAdapter == null) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mFollowers = followerResponse.getFollowerOfUsers();
+
+                                mAdapter = new RecyclerViewAdapter(FollowersActivity.this, followerResponse.getFollowerOfUsers());
+                                recyclerView.setAdapter(mAdapter);
+                                recyclerView.setHasFixedSize(true);
+                                hideProgressbar();
+
+                                recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+                                    @Override
+                                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                                        super.onScrolled(recyclerView, dx, dy);
+                                        mVisibleItemCount = recyclerView.getChildCount();
+                                        mTotalItemCount = linearLayoutManager.getItemCount();
+                                        mFirstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
+
+                                        if (isTheEnd) {
+                                            return;
+                                        }
+
+                                        int lastInScreen = mFirstVisibleItem + mVisibleItemCount;
+
+                                        if ((lastInScreen == mTotalItemCount) && !(isLoading) && (mTotalItemCount >= 30) && !isTheEnd) {
+                                            cursor = followerResponse.getNext_cursor();
+                                            isLoading = true;
+                                            loadOffline();
+
+                                        }
+
+                                    }
+                                });
+                            }
+                        });
+
+                    } else {
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mFollowers.addAll(followerResponse.getFollowerOfUsers());
+                                mAdapter.add(followerResponse.getFollowerOfUsers());
+                                hideProgressbar();
+                                isLoading = false;
+                            }
+                        });
+
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(FollowersActivity.this, getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+            }
+        }).start();
+
+
+    }
+
     @Override
     public void notifyFollowersData(FollowerResponse followerResponse) {
 

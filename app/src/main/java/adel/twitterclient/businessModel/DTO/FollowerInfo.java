@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
+import com.j256.ormlite.field.DatabaseField;
+
 
 import java.util.ArrayList;
 
@@ -13,28 +15,47 @@ import java.util.ArrayList;
 
 public class FollowerInfo implements Parcelable {
     @SerializedName("id_str")
+    @DatabaseField(id = true)
     private String id;
 
-    @SerializedName("description")
-    private String bio;
     @SerializedName("name")
+    @DatabaseField(canBeNull = false)
     private String name;
+
+    @SerializedName("description")
+    @DatabaseField
+    private String bio;
 
 
     @SerializedName("screen_name")
+    @DatabaseField
     private String screenName;
 
+    @SerializedName("profile_image_url_https")
+    @DatabaseField
+    private String profileImageUrlHttps;
+
+    @SerializedName("profile_background_color")
+    @DatabaseField
+    private String profileBackgroundColor;
+
     @SerializedName("profile_image_url")
+    @DatabaseField
     private String profileImageUrl;
 
     @SerializedName("profile_banner_url")
+    @DatabaseField
     private String bannerBackgroundUrl;
+
+
 
     protected FollowerInfo(Parcel in) {
         id = in.readString();
         bio = in.readString();
         name = in.readString();
         screenName = in.readString();
+        profileImageUrlHttps=in.readString();
+        profileBackgroundColor=in.readString();
         profileImageUrl = in.readString();
         bannerBackgroundUrl = in.readString();
     }
@@ -108,7 +129,25 @@ public class FollowerInfo implements Parcelable {
         parcel.writeString(bio);
         parcel.writeString(name);
         parcel.writeString(screenName);
+        parcel.writeString(profileImageUrlHttps);
+        parcel.writeString(profileBackgroundColor);
         parcel.writeString(profileImageUrl);
         parcel.writeString(bannerBackgroundUrl);
+    }
+
+    public String getProfileBackgroundColor() {
+        return profileBackgroundColor;
+    }
+
+    public void setProfileBackgroundColor(String profileBackgroundColor) {
+        this.profileBackgroundColor = profileBackgroundColor;
+    }
+
+    public String getProfileImageUrlHttps() {
+        return profileImageUrlHttps;
+    }
+
+    public void setProfileImageUrlHttps(String profileImageUrlHttps) {
+        this.profileImageUrlHttps = profileImageUrlHttps;
     }
 }
