@@ -40,8 +40,8 @@ public class TwitterClientHelper {
 
     public static Response<JsonElement> GetFollowers(long userId, int pageSize, String cursor) {
         TwitterSession currentSession = Twitter.getSessionManager().getActiveSession();
-        MyTwitterApiClient apiClient = new MyTwitterApiClient(currentSession);
-        TwitterUserFollowersService followersService = apiClient.getUserFollowersService();
+        TwitterClient apiClient = new TwitterClient(currentSession);
+        TwitterUserFollowersData followersService = apiClient.getUserFollowersData();
         Call<JsonElement> call = followersService.list(userId, pageSize, cursor, false, false);
         try {
             return call.execute();
@@ -54,8 +54,8 @@ public class TwitterClientHelper {
 
     public static Response<JsonElement> GetUserTimeline(long userId, int pageSize) {
         TwitterSession currentSession = Twitter.getSessionManager().getActiveSession();
-        MyTwitterApiClient apiClient = new MyTwitterApiClient(currentSession);
-        TwitterUserTimeLine service = apiClient.getUserTimelineService();
+        TwitterClient apiClient = new TwitterClient(currentSession);
+        TwitterUserTimeData service = apiClient.getUserTimelineData();
         Call<JsonElement> call = service.list(userId, pageSize);
         try {
             return call.execute();
@@ -73,10 +73,5 @@ public class TwitterClientHelper {
         }
         return -1;
     }
-
-    public static void SignoutUser() {
-
-        Twitter.getSessionManager().clearActiveSession();
-        Twitter.logOut();
-    }
+    
 }

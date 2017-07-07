@@ -1,4 +1,4 @@
-package adel.twitterclient.ui.viewController;
+package adel.twitterclient.screens.viewController;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

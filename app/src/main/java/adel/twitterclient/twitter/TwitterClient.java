@@ -13,30 +13,30 @@ import retrofit2.http.Query;
  */
 
 
-public class MyTwitterApiClient extends TwitterApiClient {
+public class TwitterClient extends TwitterApiClient {
 
-    public MyTwitterApiClient(TwitterSession session) {
+    public TwitterClient(TwitterSession session) {
         super(session);
     }
 
 
-    public TwitterUserFollowersService getUserFollowersService() {
-        return getService(TwitterUserFollowersService.class);
+    public TwitterUserFollowersData getUserFollowersData() {
+        return getService(TwitterUserFollowersData.class);
     }
 
-    public TwitterUserTimeLine getUserTimelineService() {
-        return getService(TwitterUserTimeLine.class);
+    public TwitterUserTimeData getUserTimelineData() {
+        return getService(TwitterUserTimeData.class);
     }
 }
 
 
-interface TwitterUserFollowersService {
+interface TwitterUserFollowersData {
     @GET("/1.1/followers/list.json")
     Call<JsonElement> list(@Query("user_id") long id, @Query("count") int pageSize, @Query("cursor") String cursor, @Query("include_user_entities") boolean includeUserEntities, @Query("skip_status") boolean skipStatuses);
 
 }
 
-interface TwitterUserTimeLine {
+interface TwitterUserTimeData {
     @GET("/1.1/statuses/user_timeline.json")
     Call<JsonElement> list(@Query("user_id") long id, @Query("count") int pageSize);
 }

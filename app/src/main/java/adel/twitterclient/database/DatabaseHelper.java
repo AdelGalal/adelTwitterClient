@@ -33,7 +33,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     public void onCreate(SQLiteDatabase database, ConnectionSource connectionSource) {
         try {
             TableUtils.createTable(connectionSource, FollowerInfo.class);
-            Log.e("createTable","createTable");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -52,7 +51,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     public Dao<FollowerInfo, Integer> getFollowerInfoDao() throws SQLException {
         if (followerInfoDao == null) {
             followerInfoDao = getDao(FollowerInfo.class);
-            Log.e("getFollowerInfoDao","getFollowerInfoDao--");
         }
         return followerInfoDao;
     }

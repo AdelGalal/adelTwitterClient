@@ -1,4 +1,4 @@
-package adel.twitterclient.ui.dataController;
+package adel.twitterclient.screens.dataController;
 
 import android.content.Context;
 
@@ -12,7 +12,7 @@ import adel.twitterclient.businessModel.DTO.FollowerResponse;
 import adel.twitterclient.businessModel.gson.Gson;
 import adel.twitterclient.database.DatabaseHelper;
 import adel.twitterclient.twitter.TwitterClientHelper;
-import adel.twitterclient.ui.viewController.FollowersActivity;
+import adel.twitterclient.screens.viewController.FollowersActivity;
 import retrofit2.Response;
 
 /**
@@ -36,11 +36,19 @@ public class FollowerDataController {
     public void setFollowersListener(FollowersListener followersListener) {
         this.followersListener = followersListener;
     }
-    public void startConnectionToGetFollowers() {
+    public void startConnectionToGetFollowers(String cursor) {
         final Response<JsonElement> response = TwitterClientHelper.GetFollowers(TwitterClientHelper.GetCurrentUserId(), FollowersActivity.NUM_OF_ITEMS, cursor);
         if (response.isSuccessful()) {
             followerResponse = Gson.parseFollowers(response.body());
-            followersListener.notifyFollowersData(followerResponse);
+            if (response.isSuccessful())
+            {
+                followersListener.notifyFollowersData(followerResponse);
+            }
+            else
+            {
+                followersListener.notifyConnectionOrDataError();
+            }
+
         }
     }
 

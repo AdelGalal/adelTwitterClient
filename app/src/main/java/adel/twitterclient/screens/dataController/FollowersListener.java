@@ -1,4 +1,4 @@
-package adel.twitterclient.ui.dataController;
+package adel.twitterclient.screens.dataController;
 
 import adel.twitterclient.businessModel.DTO.FollowerResponse;
 
@@ -8,4 +8,5 @@ import adel.twitterclient.businessModel.DTO.FollowerResponse;
 
 public interface FollowersListener {
     public void notifyFollowersData(FollowerResponse followerResponse);
+    public void notifyConnectionOrDataError();
 }

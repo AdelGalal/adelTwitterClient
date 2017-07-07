@@ -1,4 +1,4 @@
-package adel.twitterclient.ui.adapter;
+package adel.twitterclient.screens.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,16 +16,9 @@ import java.util.ArrayList;
 
 import adel.twitterclient.R;
 import adel.twitterclient.businessModel.DTO.FollowerInfo;
-import adel.twitterclient.ui.viewController.FollowerInformationActivity;
+import adel.twitterclient.screens.viewController.followerDetails.FollowerInformationActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-
-/**
- * Authored by Ahmed Mabrook - ahmed.mabrook@chestnut.com
- * On Jan 2017 .
- * FollowersRecyclerViewAdapter: Describtion goes here.
- */
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -48,7 +41,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     return  viewHolder;
     }
-
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
@@ -114,17 +106,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             });
 
         }
-
-        private void emptyViewHolder() {
-
-            followerNameTextView.setText("");
-            followerHandlerTextView.setText("");
-            followerBioTextView.setText("");
-            followerImageView.setImageBitmap(null);
-            followerBioTextView.setVisibility(View.GONE);
-
-        }
-
 
     }
 

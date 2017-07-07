@@ -8,7 +8,7 @@ import android.net.NetworkInfo;
  * Created by adelhegazy on 7/5/17.
  */
 
-public class NetwrokConfig {
+public class NetwrokAvailability {
     public static boolean isConnectedToInternet(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();

@@ -12,7 +12,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.viewController.LoginActivity">
+        <activity android:name=".screens.viewController.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,9 +24,9 @@
             android:name="io.fabric.ApiKey"
             android:value="5c94cd514e9444a68081e487bbdbff6d77fd9dd2" />
 
-        <activity android:name=".ui.viewController.FollowersActivity" />
-        <activity android:name=".ui.viewController.ParentActivity" />
-        <activity android:name=".ui.viewController.FollowerInformationActivity"></activity>
+        <activity android:name=".screens.viewController.FollowersActivity" />
+        <activity android:name=".screens.viewController.ParentActivity" />
+        <activity android:name=".screens.viewController.followerDetails.FollowerInformationActivity"></activity>
     </application>
 
 </manifest>

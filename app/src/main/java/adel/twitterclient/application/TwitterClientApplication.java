@@ -2,7 +2,6 @@ package adel.twitterclient.application;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -11,7 +10,7 @@ import android.os.Build;
 
 import java.util.Locale;
 import adel.twitterclient.twitter.TwitterClientHelper;
-import adel.twitterclient.ui.viewController.LoginActivity;
+import adel.twitterclient.screens.viewController.LoginActivity;
 import adel.twitterclient.util.SharedPreference;
 
 /**
