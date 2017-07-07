@@ -1,5 +1,6 @@
 package adel.twitterclient.ui.viewController;
 
+import android.app.Activity;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.tweetui.TweetView;
 
 import adel.twitterclient.R;
+import adel.twitterclient.application.TwitterClientApplication;
 import adel.twitterclient.businessModel.DTO.FollowerInfo;
 import adel.twitterclient.businessModel.Network.NetwrokConfig;
 import adel.twitterclient.businessModel.gson.Gson;
@@ -25,24 +27,21 @@ import adel.twitterclient.twitter.TwitterClientHelper;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class FollowerInformationActivity extends ParentActivity {
-    @BindView(R.id.userProfileMainNestedScrollView)
+public class FollowerInformationActivity extends Activity {
+    @BindView(R.id.NestedScrollView)
     NestedScrollView mScrollView;
 
     @BindView(R.id.tweetsLinearLayout)
     LinearLayout tweetsLinearLayout;
 
-    @BindView(R.id.userBannerImageView)
+    @BindView(R.id.followerBannerImageView)
     ImageView backgroundImageView;
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
-    @BindView(R.id.userProfileProgressBar)
-    ProgressBar mProgressBar;
-
-    @BindView(R.id.noconnection)
-    TextView noconnection;
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
 
     @BindView(R.id.changeLanguage)
     Button changeLanguageButton;
@@ -62,9 +61,19 @@ public class FollowerInformationActivity extends ParentActivity {
 
         mFollower = getIntent().getParcelableExtra("follower");
 
-        loadProfile();
+        loadFollowerData();
+        prepareViewsActions();
     }
-    private void loadProfile() {
+    private void prepareViewsActions()
+    {
+        changeLanguageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                TwitterClientApplication.forceChangeLanguage(FollowerInformationActivity.this);
+            }
+        });
+    }
+    private void loadFollowerData() {
         if (mFollower == null) {
             Toast.makeText(this, R.string.error_msg, Toast.LENGTH_LONG).show();
             finish();
@@ -86,10 +95,10 @@ public class FollowerInformationActivity extends ParentActivity {
             }
 
 
-            loadLastTenTweets();
+            getLastTenTweets();
         }
     }
-    private void loadLastTenTweets() {
+    private void getLastTenTweets() {
         if (NetwrokConfig.isConnectedToInternet(this)) {
             new Thread(new Runnable() {
                 @Override
@@ -101,7 +110,6 @@ public class FollowerInformationActivity extends ParentActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                mScrollView.setPadding(0, 0, 0, 0);
                                 for (int i = 0; i < tweets.length; i++) {
 
                                     tweetsLinearLayout.addView(new TweetView(FollowerInformationActivity.this, tweets[i]));
@@ -111,7 +119,7 @@ public class FollowerInformationActivity extends ParentActivity {
                                     Toast.makeText(FollowerInformationActivity.this, R.string.no_tweets, Toast.LENGTH_SHORT).show();
                                 }
 
-                                mProgressBar.setVisibility(View.GONE);
+                                progressBar.setVisibility(View.GONE);
                             }
                         });
 
@@ -121,7 +129,7 @@ public class FollowerInformationActivity extends ParentActivity {
                             @Override
                             public void run() {
                                 Toast.makeText(FollowerInformationActivity.this, getString(R.string.error_msg), Toast.LENGTH_SHORT).show();
-                                mProgressBar.setVisibility(View.GONE);
+                                progressBar.setVisibility(View.GONE);
                             }
                         });
 
@@ -132,14 +140,14 @@ public class FollowerInformationActivity extends ParentActivity {
 
 
         } else {
-            toastAndShowNoConnectionText();
+            showNoConnectionToast();
         }
     }
-        private void toastAndShowNoConnectionText() {
+        private void showNoConnectionToast() {
 
             Toast.makeText(FollowerInformationActivity.this, getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
-            noconnection.setVisibility(View.VISIBLE);
-            mProgressBar.setVisibility(View.GONE);
+
+            progressBar.setVisibility(View.GONE);
 
         }
     }

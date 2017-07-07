@@ -17,27 +17,21 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.QueryBuilder;
 
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.concurrent.Callable;
 
 import adel.twitterclient.R;
 import adel.twitterclient.application.TwitterClientApplication;
-import adel.twitterclient.database.DatabaseConfig;
+import adel.twitterclient.database.DatabaseHelper;
 import adel.twitterclient.twitter.TwitterClientHelper;
 import adel.twitterclient.businessModel.DTO.FollowerInfo;
 import adel.twitterclient.businessModel.DTO.FollowerResponse;
 import adel.twitterclient.businessModel.Network.NetwrokConfig;
 import adel.twitterclient.businessModel.gson.Gson;
 import adel.twitterclient.ui.adapter.RecyclerViewAdapter;
-import adel.twitterclient.ui.dataController.FollowerDataController;
 import adel.twitterclient.ui.dataController.FollowersListener;
-import adel.twitterclient.util.SharedPreference;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import retrofit2.Response;
-
-import static adel.twitterclient.application.TwitterClientApplication.LOCAL_LANG;
 
 public class FollowersActivity extends Activity implements FollowersListener {
     @BindView(R.id.recycler_view)
@@ -54,7 +48,7 @@ public class FollowersActivity extends Activity implements FollowersListener {
      @BindView(R.id.loader)
      ProgressBar progressBar;
 
-    private DatabaseConfig databaseConfig;
+    private DatabaseHelper databaseHelper;
     LinearLayoutManager linearLayoutManager;
     ArrayList<FollowerInfo> mFollowers;
     RecyclerViewAdapter mAdapter;
@@ -74,7 +68,7 @@ public class FollowersActivity extends Activity implements FollowersListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        databaseConfig = new DatabaseConfig(this);
+        databaseHelper = new DatabaseHelper(this);
 
         ButterKnife.bind(this);
         prepareViewsAndData();
@@ -82,7 +76,7 @@ public class FollowersActivity extends Activity implements FollowersListener {
     }
     private void prepareViewsAndData()
     {
-        databaseConfig = new DatabaseConfig(FollowersActivity.this);
+       // databaseHelper = new DatabaseHelper(FollowersActivity.this);
         linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
         followerSwipeRefreshLayout.setOnRefreshListener(swipRefreshListener);
@@ -175,7 +169,7 @@ public class FollowersActivity extends Activity implements FollowersListener {
             }).start();
         }
         else {
-            loadOffline();
+            GetCachedData();
             showErrorToast();
             hideProgressbar();
 
@@ -249,7 +243,7 @@ public class FollowersActivity extends Activity implements FollowersListener {
             public void run() {
                 try {
                     Log.e("accessAndUpdateDatabase--","accessAndUpdateDatabase--");
-                    final Dao<FollowerInfo, Integer> followersDao = databaseConfig.getFollowerInfoDao();
+                    final Dao<FollowerInfo, Integer> followersDao = databaseHelper.getFollowerInfoDao();
                     followersDao.callBatchTasks(new Callable<Void>() {
                         @Override
                         public Void call() throws Exception {
@@ -264,20 +258,20 @@ public class FollowersActivity extends Activity implements FollowersListener {
 
 
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    Log.e("save followers", ex.toString());
                 }
             }
         }).start();
 
     }
-    private void loadOffline() {
+    private void GetCachedData() {
         Log.e("loadOffline","loadOffline");
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    final Dao<FollowerInfo, Integer> followersDao = databaseConfig.getFollowerInfoDao();
-                    Log.e("loadOffline","loadOffline"+databaseConfig.getFollowerInfoDao());
+                    final Dao<FollowerInfo, Integer> followersDao = databaseHelper.getFollowerInfoDao();
+                    Log.e("loadOffline","loadOffline"+databaseHelper.getFollowerInfoDao());
                     int totalNumber = (int) followersDao.countOf();
                     QueryBuilder<FollowerInfo, Integer> builder = followersDao.queryBuilder();
 
@@ -329,7 +323,7 @@ public class FollowersActivity extends Activity implements FollowersListener {
                                         if ((lastInScreen == mTotalItemCount) && !(isLoading) && (mTotalItemCount >= 30) && !isTheEnd) {
                                             cursor = followerResponse.getNext_cursor();
                                             isLoading = true;
-                                            loadOffline();
+                                            GetCachedData();
 
                                         }
 

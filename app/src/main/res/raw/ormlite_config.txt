@@ -1,0 +1,27 @@
+# --table-start--
+dataClass=del.twitterclient.businessModel.DTO.FollowerInfo
+tableName=follower_details
+# --table-fields-start--
+# --field-start--
+fieldName=id
+columnName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=name
+columnName=name
+# --field-end--
+# --field-start--
+fieldName=bio
+columnName=bio
+# --field-end--
+# --field-start--
+fieldName=screenName
+columnName=screenName
+# --field-end--
+# --field-start--
+fieldName=profileImageUrl
+columnName=profileImageUrl
+# --field-end--
+# --table-fields-end--
+# --table-end--

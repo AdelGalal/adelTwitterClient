@@ -10,7 +10,7 @@ import java.util.concurrent.Callable;
 import adel.twitterclient.businessModel.DTO.FollowerInfo;
 import adel.twitterclient.businessModel.DTO.FollowerResponse;
 import adel.twitterclient.businessModel.gson.Gson;
-import adel.twitterclient.database.DatabaseConfig;
+import adel.twitterclient.database.DatabaseHelper;
 import adel.twitterclient.twitter.TwitterClientHelper;
 import adel.twitterclient.ui.viewController.FollowersActivity;
 import retrofit2.Response;
@@ -24,12 +24,12 @@ public class FollowerDataController {
     private String cursor;
     private FollowerResponse followerResponse;
     private FollowersListener followersListener;
-    private DatabaseConfig databaseConfig;
+    private DatabaseHelper databaseConfig;
     public FollowerDataController(Context context,String cursor)
     {
         this.context=context;
         this.cursor=cursor;
-        databaseConfig = new DatabaseConfig(context);
+        databaseConfig = new DatabaseHelper(context);
 
     }
 

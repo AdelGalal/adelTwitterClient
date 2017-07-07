@@ -32,7 +32,6 @@ public class FollowerInfo implements Parcelable {
     private String screenName;
 
     @SerializedName("profile_image_url_https")
-    @DatabaseField
     private String profileImageUrlHttps;
 
     @SerializedName("profile_background_color")
@@ -44,11 +43,12 @@ public class FollowerInfo implements Parcelable {
     private String profileImageUrl;
 
     @SerializedName("profile_banner_url")
-    @DatabaseField
     private String bannerBackgroundUrl;
 
 
 
+    public FollowerInfo() {
+    }
     protected FollowerInfo(Parcel in) {
         id = in.readString();
         bio = in.readString();
@@ -129,7 +129,7 @@ public class FollowerInfo implements Parcelable {
         parcel.writeString(bio);
         parcel.writeString(name);
         parcel.writeString(screenName);
-        parcel.writeString(profileImageUrlHttps);
+       parcel.writeString(profileImageUrlHttps);
         parcel.writeString(profileBackgroundColor);
         parcel.writeString(profileImageUrl);
         parcel.writeString(bannerBackgroundUrl);
